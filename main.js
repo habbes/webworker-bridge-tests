@@ -1,7 +1,8 @@
 const app = {
-    _output: document.getElementById('output'),
+    output: document.getElementById('output'),
     writeOutput (msg) {
-        this._output.textContent = `${this._output.textContent}${msg}\n`;
+        const text = document.createTextNode(`${msg}\n`);
+        this.output.appendChild(text);
     }
 };
 
