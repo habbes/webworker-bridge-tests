@@ -25,7 +25,7 @@
         const worker = new Worker('worker.js');
         worker.postMessage({ code: getCode() });
         worker.onmessage = e => {
-            bridge.run(bridge.modules, e.data);
+            bridge.run(hostPort, e.data);
         };
     }
     </script>
@@ -52,26 +52,22 @@ const app = {
     }
 }
 
-const appBridge = {
+const hostPort = {
     __module: true,
-    writeOutput: (args) => {
-        console.log('writeOutput bridge called', args);
-        app.writeOutput(...args);
+    app: {
+        __module: true,
+        writeOutput: (args) => {
+            app.writeOutput(...args);
+        }
     }
-};
+}
 
 const bridge = {
-    modules: {
-        __module: true,
-        app: appBridge
-    },
-    run (hostBridge, workerBridge) {
-        console.log('bridge run', 'host', hostBridge, 'worker', workerBridge);
-        for (module in workerBridge) {
-            if (module in hostBridge) {
-                const host = hostBridge[module];
-                const worker = workerBridge[module];
-                console.log('child', host, worker);
+    run (hostPort, workerPort) {
+        for (module in workerPort) {
+            if (module in hostPort) {
+                const host = hostPort[module];
+                const worker = workerPort[module];
                 if (host.__module) {
                     // sub module
                     this.run(host, worker)
