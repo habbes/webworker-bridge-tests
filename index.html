@@ -28,7 +28,9 @@
 // This code is executed on a worker thread
 
 // the app object bridges to the main thread
-app.writeOutput('Hello, World!');
+app.writeOutput('Started');
+for (let i = 0; i < 10000000000; ++i) {}
+app.write('Done');
 </textarea>
 </div>
 <div><button id="runBtn">Run Code</button></div>
