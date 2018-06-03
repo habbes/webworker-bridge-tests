@@ -10,7 +10,10 @@ This simple implementation creates a bridge between corresponding pairs of "port
 an the other in the worker. When a function on the worker port is called, it passes data regarding which object/method
 was called, as well as the arguments to the host via `postMessage`. On the host, the bridge intercepts this call and
 proxies it to the corresponding port on the host. The host port finally calls the intended object method on the host.
-This is in someways analogues to "remote" procedure calls, but between a web worker and its host.
+This is in someways analogous to RPC, but between a web worker and its host.
 
 I've not fully explored the viability of this approach, but I can already think of some limitations. The worker port
 can only pass as arguments to the bridge the subset of objects that are permitted by `postMessage`.
+
+This is demo also does not account for cases where the worker expects a return value or synchronous result from the host's method,
+e.g. `imageSource.read()`.
