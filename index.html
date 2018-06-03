@@ -18,16 +18,7 @@
         }
     </style>
     <script>
-    function getCode () {
-        return document.getElementById('editor').value;
-    }
-    function runCode () {
-        const worker = new Worker('worker.js');
-        worker.postMessage({ code: getCode() });
-        worker.onmessage = e => {
-            bridge.run(hostPort, e.data);
-        };
-    }
+    
     </script>
 </head>
 <body>
@@ -40,46 +31,10 @@
 app.writeOutput('Hello, World!');
 </textarea>
 </div>
-<div><button id="runBtn" onclick="runCode()">Run Code</button></div>
+<div><button id="runBtn">Run Code</button></div>
 <h3>Output</h3>
 <pre id="output"></pre>
 
-<script>
-const app = {
-    _output: document.getElementById('output'),
-    writeOutput (msg) {
-        this._output.textContent = `${this._output.textContent}${msg}\n`;
-    }
-}
-
-const hostPort = {
-    __module: true,
-    app: {
-        __module: true,
-        writeOutput: (args) => {
-            app.writeOutput(...args);
-        }
-    }
-}
-
-const bridge = {
-    run (hostPort, workerPort) {
-        for (module in workerPort) {
-            if (module in hostPort) {
-                const host = hostPort[module];
-                const worker = workerPort[module];
-                if (host.__module) {
-                    // sub module
-                    this.run(host, worker)
-                }
-                else {
-                    // function
-                    host(worker);
-                }
-            }
-        };
-    }
-}
-</script>
+<script src="main.js"></script>
 </body>
 </html>
