@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+    <title>Webworker Test</title>
+    <style>
+        #editor {
+            font-family: monospace;
+            width: 500px;
+            height: 500px;
+        }
+        #output {
+            background-color: black;
+            color: white;
+            width: 500px;
+            height: 200px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+    </style>
+    <script>
+    function getCode () {
+        return document.getElementById('editor').value;
+    }
+    function runCode () {
+        const worker = new Worker('worker.js');
+        worker.postMessage({ code: getCode() });
+        worker.onmessage = e => {
+            bridge.run(bridge.modules, e.data);
+        };
+    }
+    </script>
+</head>
+<body>
+<h2>Enter Code</h2>
+<div>
+<textarea id="editor">
+// This code is executed on a worker thread
+
+// the app object bridges to the main thread
+app.writeOutput('Hello, World!');
+</textarea>
+</div>
+<div><button id="runBtn" onclick="runCode()">Run Code</button></div>
+<h3>Output</h3>
+<pre id="output"></pre>
+
+<script>
+const app = {
+    _output: document.getElementById('output'),
+    writeOutput (msg) {
+        this._output.textContent = `${this._output.textContent}${msg}\n`;
+    }
+}
+
+const appBridge = {
+    __module: true,
+    writeOutput: (args) => {
+        console.log('writeOutput bridge called', args);
+        app.writeOutput(...args);
+    }
+};
+
+const bridge = {
+    modules: {
+        __module: true,
+        app: appBridge
+    },
+    run (hostBridge, workerBridge) {
+        console.log('bridge run', 'host', hostBridge, 'worker', workerBridge);
+        for (module in workerBridge) {
+            if (module in hostBridge) {
+                const host = hostBridge[module];
+                const worker = workerBridge[module];
+                console.log('child', host, worker);
+                if (host.__module) {
+                    // sub module
+                    this.run(host, worker)
+                }
+                else {
+                    // function
+                    host(worker);
+                }
+            }
+        };
+    }
+}
+</script>
+</body>
+</html>
