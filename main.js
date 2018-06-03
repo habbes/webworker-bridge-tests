@@ -3,7 +3,7 @@ const app = {
     writeOutput (msg) {
         this._output.textContent = `${this._output.textContent}${msg}\n`;
     }
-}
+};
 
 const hostPort = {
     __module: true,
@@ -13,7 +13,7 @@ const hostPort = {
             app.writeOutput(...args);
         }
     }
-}
+};
 
 const bridge = {
     execute (hostPort, workerPort) {

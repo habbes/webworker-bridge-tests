@@ -7,7 +7,7 @@ const workerPort = {
                 app: {
                     writeOutput: [msg]
                 }
-            })
+            });
         }
     }
 };
